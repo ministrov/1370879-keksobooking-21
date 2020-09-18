@@ -1,7 +1,7 @@
 # Личный проект «Кексобукинг» [![Build status][travis-image]][travis-url]
 
 * Студент: [Антон Жилин](https://up.htmlacademy.ru/javascript/21/user/1370879).
-* Наставник: `Неизвестно`.
+* Наставник: [Юлия Корецкая](https://htmlacademy.ru/profile/id11886).
 
 ---
 
