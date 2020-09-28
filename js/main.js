@@ -7,6 +7,13 @@ const CHECKOUTDATA = ['12:00', '13:00', '14:00'];
 const APARTMENTTYPELIST = ['palace', 'flat', 'house', 'bungalow'];
 const MINY = 130;
 const MAXY = 630;
+const fragment = document.createDocumentFragment();
+const map = document.querySelector('.map');
+map.classList.remove('map--faded');
+const similarAddElement = map.querySelector(`.map__pins`);
+const similarAddTemplate = document.querySelector(`#pin`).content.querySelector(`.map__pin`);
+const PIN_WIDTH = 50;
+const PIN_HEIGHT = 70;
 
 // Фунция для получения случайного числа в указанном диапозоне
 
@@ -56,12 +63,20 @@ let getPins = function () {
         "photos": getArrayRandomly(PHOTOLIST)
       },
       "location": {
-        "x": 2,
+        "x": getNumberRandomly(0, 1200),
         "y": getNumberRandomly(MINY, MAXY)
       }
     }; // закончился объект
   } // закончился  цикл
-  return pins;
 };
 
-console.log(getPins());
+const renderAdd = (add) => {
+  const addElement = similarAddTemplate.cloneNode(true);
+  addElement.style = `left: ${add.location.x + PIN_WIDTH}px; top: ${add.location.y + PIN_HEIGHT}px;`;
+  addElement.querySelector('img').src = add.author.avatar;
+  addElement.querySelector('img').alt = add.offer.title;
+  return addElement;
+};
+
+getPins(8).forEach((add) => fragment.appendChild(renderAdd(add)));
+similarAddElement.appendChild(fragment);
