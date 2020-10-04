@@ -19,7 +19,7 @@ const LOCATION_Y_MAX = 630;
 const PIN_WIDTH = 50;
 const PIN_HEIGHT = 70;
 
-const TITLE_RENT = [
+const RENT_WORDS = [
   `Сдам`,
   `Сдается`,
   `Свободно жилье -`,
@@ -106,7 +106,7 @@ const getRandomArrayElements = (arr, n = 1) => {
 };
 
 const getTitle = (type) => {
-  return `${getRandomIntNumber(0, TITLE_RENT)} ${typesMap[type]}${(Math.random() < 0.5 ? `!` : `.`)}`;
+  return `${RENT_WORDS[getRandomIntNumber(0, RENT_WORDS.length - 1)]} ${typesMap[type]} ${(Math.random() < 0.5 ? `!` : `.`)}`;
 };
 
 const getDescription = (type, rooms) => {
@@ -130,7 +130,7 @@ const generateMocks = (n) => {
         avatar: `img/avatars/user${avatarNumbers[i]}.png`
       },
       offer: {
-        title: getRandomArrayElements(TITLE_RENT),
+        title: getRandomArrayElements(RENT_WORDS),
         address: ``,
         price: getRandomIntNumber(PRICE_MIN, PRICE_MAX) * PRICE_STEP,
         type: getRandomIntNumber(0, APARTMENT_TYPES.length - 1),
@@ -259,9 +259,9 @@ const renderOfferCard = (item) => {
 
 const offers = generateMocks(MOCK_QUANTITY);
 
-for (let i = 0; i < offers.length; i++) {
-  fragmentPinList.append(renderOfferPin(offers[i]));
-}
+offers.forEach((pin) => {
+  fragmentPinList.append(renderOfferPin(pin));
+});
 
 offersZone.append(fragmentPinList);
 fragmentOfferCards.append(renderOfferCard(offers[0]));
