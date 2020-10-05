@@ -196,7 +196,7 @@ const renderOfferCard = (item) => {
   offerPreset.querySelector(`.popup__type`).textContent = typesMap[type];
 
   if (price) {
-    offerPreset.querySelector(`.popup__text--price`).innerHTML = `${price}&#x20bd;<span>/ночь</span>`;
+    offerPreset.querySelector(`.popup__text--price`).textContent = `${price}/ночь`;
   } else {
     offerPreset.querySelector(`.popup__text--price`).textContent = ``;
   }
