@@ -302,23 +302,12 @@ offers.forEach((pin) => {
 offersZone.append(fragmentPinList);
 fragmentOfferCards.append(renderOfferCard(offers[0]));
 map.insertBefore(fragmentOfferCards, filtersContainer);
-map.classList.remove(`map--faded`);
 
-const getId = () => {
-  let offersWithId = offers.slice();
-
-  offersWithId.forEach((offer, i) => {
-    offer.id = `${i}`;
-  });
-
-  return offersWithId;
-};
-
-const toggleFormElementsState = (form, ativate) => {
+const toggleFormElementsState = (form, isActive) => {
   const fieldsets = form.querySelectorAll(`fieldset`);
 
   fieldsets.forEach((fieldset) => {
-    fieldset.disabled = !ativate;
+    fieldset.disabled = !isActive;
   });
 };
 
@@ -344,7 +333,7 @@ const activatePage = () => {
     map.classList.remove(`map--faded`);
     adForm.classList.remove(`ad-form--disabled`);
 
-    offersWithId.forEach((pin) => {
+    offers.forEach((pin) => {
       fragmentPinList.append(renderOfferPin(pin));
     });
 
@@ -365,7 +354,7 @@ const deactivatePage = () => {
 };
 
 const openPopup = (id) => {
-  const card = offersWithId.find((item) => {
+  const card = offers.find((item) => {
     return item.id === id;
   });
   openedCard = renderOfferCard(card);
@@ -374,7 +363,6 @@ const openPopup = (id) => {
   popupClose = openedCard.querySelector(`.popup__close`);
   popupClose.addEventListener(`click`, onPopupClose);
   popupClose.addEventListener(`keydown`, onPopupEnterPress);
-  document.addEventListener(`keydown`, onPopupEscPress);
 };
 
 const closePopup = () => {
@@ -386,13 +374,6 @@ const closePopup = () => {
 
 const onPopupClose = () => {
   closePopup();
-};
-
-const onPopupEscPress = (evt) => {
-  if (evt.key === `Escape`) {
-    evt.preventDefault();
-    closePopup();
-  }
 };
 
 const onPopupEnterPress = (evt) => {
@@ -413,11 +394,10 @@ const openOffer = (evt) => {
 
 deactivatePage();
 
-const offersWithId = getId(offers);
-
 mainMapPin.addEventListener(`mousedown`, (evt) => {
   if (evt.button === 0) {
     activatePage();
+    map.classList.remove(`map--faded`);
   }
 });
 
