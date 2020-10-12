@@ -94,12 +94,12 @@ const capacityOptions = {
   100: `<option value="0" selected>не для гостей</option>`,
 };
 
-const map = document.querySelector('.map');
+const map = document.querySelector(`.map`);
 const fragmentPinList = document.createDocumentFragment();
 const fragmentOfferCards = document.createDocumentFragment();
 const cardTemplate = document.querySelector(`#card`).content.querySelector(`.popup`);
 const filtersContainer = map.querySelector(`.map__filters-container`);
-const adForm = document.querySelector('.ad-form');
+const adForm = document.querySelector(`.ad-form`);
 const adFormTitle = adForm.querySelector(`#title`);
 const adFormAddress = adForm.querySelector(`#address`);
 const adFormPrice = adForm.querySelector(`#price`);
@@ -110,6 +110,7 @@ const adFormTimeout = adForm.querySelector(`#timeout`);
 const adFormRoomNumber = adForm.querySelector(`#room_number`);
 const adFormCapacity = adForm.querySelector(`#capacity`);
 const mainMapPin = map.querySelector(`.map__pin--main`);
+let currentOpenedCard;
 
 const getRandomIntNumber = (min = 0, max = 100) => {
   return min + Math.floor(Math.random() * (max - min + 1));
@@ -299,8 +300,6 @@ offers.forEach((pin) => {
   fragmentPinList.append(renderOfferPin(pin));
 });
 
-offersZone.append(fragmentPinList);
-fragmentOfferCards.append(renderOfferCard(offers[0]));
 map.insertBefore(fragmentOfferCards, filtersContainer);
 
 const toggleFormElementsState = (form, isActive) => {
@@ -384,11 +383,13 @@ const onPopupEnterPress = (evt) => {
 };
 
 const openOffer = (evt) => {
-  const id = evt.target.closest(`.map__pin`).dataset.id;
+  if (evt.target.closest(`.map__pin`)) {
+    const id = evt.target.closest(`.map__pin`).dataset.id;
 
-  if (id) {
-    closePopup();
-    openPopup(id);
+    if ((!currentOpenedCard || currentOpenedCard.dataset.id !== id) && id) {
+      closePopup();
+      openPopup(id);
+    }
   }
 };
 
@@ -407,7 +408,7 @@ mainMapPin.addEventListener(`keydown`, (evt) => {
   }
 });
 
-adFormTitle.addEventListener(`input`, () => {
+adFormTitle.addEventListener(`invalid`, () => {
   const valueLength = adFormTitle.value.length;
 
   if (valueLength < MIN_TITLE_LENGTH) {
