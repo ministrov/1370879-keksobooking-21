@@ -92,17 +92,14 @@ const minPricesMap = {
   house: 5000,
   bungalow: 0,
 };
-/*
-const capacityOptions = {
-  1: `<option value="1" selected>для 1 гостя</option>`,
-  2: `<option value="2">для 2 гостей</option>
-      <option value="1" selected>для 1 гостя</option>`,
-  3: `<option value="3">для 3 гостей</option>
-      <option value="2">для 2 гостей</option>
-      <option value="1" selected>для 1 гостя</option>`,
-  100: `<option value="0" selected>не для гостей</option>`,
+
+const numberOfGuests = {
+  1: ['1'],
+  2: ['1', '2'],
+  3: ['1', '2', '3'],
+  100: ['0']
 };
-*/
+
 const map = document.querySelector(`.map`);
 const fragmentPinList = document.createDocumentFragment();
 const fragmentOfferCards = document.createDocumentFragment();
@@ -120,6 +117,27 @@ const adFormRoomNumber = adForm.querySelector(`#room_number`);
 const adFormCapacity = adForm.querySelector(`#capacity`);
 const mainMapPin = map.querySelector(`.map__pin--main`);
 let currentOpenedCard;
+
+const capacityOptions = adFormCapacity.querySelectorAll('option');
+
+const validateRooms = () => {
+  const roomValue = adFormRoomNumber.value;
+  capacityOptions.forEach((option) => {
+    let isDisabled = !(numberOfGuests[roomValue].indexOf(option.value) >= 0);
+
+    option.selected = numberOfGuests[roomValue][0] === option.value;
+    option.disabled = isDisabled;
+    option.hidden = isDisabled;
+  });
+};
+
+const onRoomNumberChange = () => {
+  validateRooms();
+};
+
+validateRooms();
+
+adFormRoomNumber.addEventListener(`change`, onRoomNumberChange);
 
 const getRandomIntNumber = (min = 0, max = 100) => {
   return min + Math.floor(Math.random() * (max - min + 1));
@@ -152,18 +170,10 @@ const getDescription = (type, rooms) => {
 const generateMocks = (n) => {
   const generatedMocks = [];
 
-  let avatarNumbers = [];
-
-  for (let i = 1; i <= n; i++) {
-    avatarNumbers.push(i < 10 ? `0` + i : i);
-  }
-
-  avatarNumbers = getRandomArrayElements(avatarNumbers, n);
-
   for (let i = 0; i < n; i++) {
     const mock = {
       author: {
-        avatar: `img/avatars/user${avatarNumbers[i]}.png`
+        avatar: `img/avatars/user0${i + 1}.png`
       },
       offer: {
         title: getRandomArrayElements(RENT_WORDS),
@@ -194,6 +204,15 @@ const generateMocks = (n) => {
   return generatedMocks;
 };
 
+const closePopup = () => {
+  const popup = map.querySelector(`.popup`);
+
+  if (popup) {
+    popup.remove();
+    document.removeEventListener(`keydown`, onCardEscKeyDown);
+  }
+};
+
 const renderOfferPin = (offer) => {
   const offerPreset = pinTemplate.cloneNode(true);
 
@@ -204,7 +223,18 @@ const renderOfferPin = (offer) => {
   img.src = `${offer.author.avatar}`;
   img.alt = `${offer.offer.title}`;
 
+  offerPreset.addEventListener(`click`, () => {
+    closePopup();
+    renderOfferCard(offer);
+  });
+
   return offerPreset;
+};
+
+const onCardEscKeyDown = (evt) => {
+  if (evt.key === Key.ESC) {
+    closePopup();
+  }
 };
 
 const renderOfferCard = (item) => {
@@ -282,19 +312,18 @@ const renderOfferCard = (item) => {
       }
     }
   }
-  /*
-  for (let i = 0; i < offerPreset.children.length; i++) {
-    if (
-      (!offerPreset.children[i].textContent && i > 1 && i !== 8 && i !== 10) ||
-      (!offerPreset.children[i].src && i === 0) ||
-      (!offerPreset.children[i].querySelectorAll(`li`).length && i === 8) ||
-      (!offerPreset.children[i].querySelectorAll(`img`).length && i === 10)
-    ) {
-      offerPreset.children[i].classList.add(`hidden`);
+
+  const closeButton = offerPreset.querySelector(`.popup__close`);
+
+  closeButton.addEventListener(`click`, () => {
+    if (evt.button === MouseKey.LEFT) {
+      closePopup();
     }
-  }
-*/
-  return offerPreset;
+  });
+
+  document.addEventListener(`keydown`, onCardEscKeyDown);
+
+  map.insertBefore(offerPreset, filtersContainer);
 };
 
 const offers = generateMocks(MOCK_QUANTITY);
@@ -325,10 +354,6 @@ const completeAddressInput = () => {
   adFormAddress.value = `${Math.round(parseInt(mainMapPin.style.left, 10) + MAIN_MAP_PIN_WIDTH / 2)}, ${y}`;
 };
 
-const changeCapacityOptions = () => {
-  adFormCapacity.innerHTML = capacityOptions[adFormRoomNumber.value];
-};
-
 const activatePage = () => {
   toggleFormElementsState();
   completeAddressInput();
@@ -346,58 +371,16 @@ const deactivatePage = () => {
   completeAddressInput();
 
   toggleFormElementsState();
-  changeCapacityOptions();
 
   const minPrice = minPricesMap[adFormType.value];
   adFormPrice.placeholder = minPrice;
   adFormPrice.min = minPrice;
 };
-/*
-const openPopup = (id) => {
-  const card = offers.find((item) => {
-    return item.id === id;
-  });
-  openedCard = renderOfferCard(card);
-  map.append(openedCard);
 
-  popupClose = openedCard.querySelector(`.popup__close`);
-  popupClose.addEventListener(`click`, onPopupClose);
-  popupClose.addEventListener(`keydown`, onPopupEnterPress);
-};
-
-const closePopup = () => {
-  if (openedCard) {
-    map.removeChild(openedCard);
-    openedCard = null;
-  }
-};
-
-const onPopupClose = () => {
-  closePopup();
-};
-
-const onPopupEnterPress = (evt) => {
-  if (evt.key === Key.ENTER) {
-    evt.preventDefault();
-    closePopup();
-  }
-};
-
-const openOffer = (evt) => {
-  if (evt.target.closest(`.map__pin`)) {
-    const id = evt.target.closest(`.map__pin`).dataset.id;
-
-    if ((!currentOpenedCard || currentOpenedCard.dataset.id !== id) && id) {
-      closePopup();
-      openPopup(id);
-    }
-  }
-};
-*/
 deactivatePage();
 
 mainMapPin.addEventListener(`mousedown`, (evt) => {
-  if (evt.button === MouseKey) {
+  if (evt.button === MouseKey.LEFT) {
     activatePage();
   }
 });
@@ -408,62 +391,16 @@ mainMapPin.addEventListener(`keydown`, (evt) => {
   }
 });
 
-/*
-adFormTitle.addEventListener(`invalid`, () => {
-  const valueLength = adFormTitle.value.length;
-
-  if (valueLength < MIN_TITLE_LENGTH) {
-    adFormTitle.setCustomValidity(`Еще ${MIN_TITLE_LENGTH - valueLength} символов`);
-  } else if (valueLength > MAX_TITLE_LENGTH) {
-    adFormTitle.setCustomValidity(`Удалите лишние ${valueLength - MAX_TITLE_LENGTH} символов`);
-  } else {
-    adFormTitle.setCustomValidity(``);
-  }
-
-  adFormTitle.reportValidity();
-});
-
-adFormPrice.addEventListener(`input`, () => {
-  const price = adFormPrice.value;
-  const minPrice = minPricesMap[adFormType.value];
-
-  if (price < minPrice) {
-    adFormPrice.setCustomValidity(`Минимальная цена за ночь ${minPrice} руб. Вам стоит увеличить цену.`);
-  } else if (price > MAX_PRICE) {
-    adFormPrice.setCustomValidity(`Максимальная цена за ночь ${MAX_PRICE} руб. Вам стоит уменьшить цену.`);
-  } else {
-    adFormPrice.setCustomValidity(``);
-  }
-
-  adFormPrice.reportValidity();
-});
-
 adFormType.addEventListener(`change`, () => {
   const minPrice = minPricesMap[adFormType.value];
   adFormPrice.placeholder = minPrice;
   adFormPrice.min = minPrice;
 });
 
-adFormTime.addEventListener(`change`, (evt) => {
-  adFormTimeout.value = evt.target.value;
-  adFormTimein.value = evt.target.value;
+adFormTimein.addEventListener(`change`, () => {
+  adFormTimeout.value = adFormTimein.value;
 });
 
-adFormRoomNumber.addEventListener(`change`, () => {
-  changeCapacityOptions();
+adFormTimeout.addEventListener(`change`, () => {
+  adFormTimein.value = adFormTimeout.value;
 });
-
-let openedCard;
-let popupClose;
-
-offersZone.addEventListener(`click`, (evt) => {
-  openOffer(evt);
-});
-
-
-offersZone.addEventListener(`keydown`, (evt) => {
-  if (evt.key === `Enter`) {
-    openOffer(evt);
-  }
-});
-*/
