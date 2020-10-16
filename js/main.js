@@ -62,6 +62,15 @@ const PHOTO = [
   `http://o0.github.io/assets/images/tokyo/hotel3.jpg`,
 ];
 
+const Key = {  // Enum object
+  ENTER: `Enter`,
+  ESC: `Escape`
+};
+
+const MouseKey = {
+  LEFT: 0
+};
+
 const typesMap = {
   palace: `Дворец`,
   flat: `Квартира`,
@@ -83,7 +92,7 @@ const minPricesMap = {
   house: 5000,
   bungalow: 0,
 };
-
+/*
 const capacityOptions = {
   1: `<option value="1" selected>для 1 гостя</option>`,
   2: `<option value="2">для 2 гостей</option>
@@ -93,7 +102,7 @@ const capacityOptions = {
       <option value="1" selected>для 1 гостя</option>`,
   100: `<option value="0" selected>не для гостей</option>`,
 };
-
+*/
 const map = document.querySelector(`.map`);
 const fragmentPinList = document.createDocumentFragment();
 const fragmentOfferCards = document.createDocumentFragment();
@@ -128,18 +137,8 @@ const getTrueNumericalEndingWords = (q = 1, word) => {
   return `${q} ${numericalEndingsMap[word][2]}`;
 };
 
-const getRandomArrayElements = (arr, n = 1) => {
-  let randomArray = [];
-
-  for (let i = 0; i < arr.length && i < n; i++) {
-    const element = getRandomIntNumber(i, arr.length - 1);
-    randomArray.push(arr[element]);
-    const swap = arr[element];
-    arr[element] = arr[i];
-    arr[i] = swap;
-  }
-
-  return randomArray;
+const getRandomArrayElements = (arr) => {
+  return arr[getRandomIntNumber(0, arr.length - 1)];
 };
 
 const getTitle = (type) => {
@@ -198,9 +197,12 @@ const generateMocks = (n) => {
 const renderOfferPin = (offer) => {
   const offerPreset = pinTemplate.cloneNode(true);
 
-  offerPreset.style = `left: ${offer.location.x - PIN_WIDTH / 2}px; top: ${offer.location.y - PIN_HEIGHT}px`;
-  offerPreset.querySelector(`img`).src = `${offer.author.avatar}`;
-  offerPreset.querySelector(`img`).alt = `${offer.offer.title}`;
+  offerPreset.style.left = `${offer.location.x - PIN_WIDTH / 2}px`;
+  offerPreset.style.top = `${offer.location.y - PIN_HEIGHT}px`;
+
+  let img = offerPreset.querySelector(`img`);
+  img.src = `${offer.author.avatar}`;
+  img.alt = `${offer.offer.title}`;
 
   return offerPreset;
 };
@@ -262,24 +264,25 @@ const renderOfferCard = (item) => {
 
   for (let i = 0; i < features.length; i++) {
     const feature = document.createElement(`li`);
-    feature.classList.add(`popup__feature`);
-    feature.classList.add(`popup__feature--${features[i]}`);
+    feature.classList.add(`popup__feature`, `popup__feature--${features[i]}`);
     popupFeatures.append(feature);
-  }
-
-  for (let i = 0; i < photos.length; i++) {
-    offerPreset.querySelectorAll(`.popup__photo`)[i].src = photos[i];
-
-    if (i < photos.length - 1) {
-      offerPreset.querySelector(`.popup__photos`);
-      offerPreset.append(offerPreset.querySelector(`.popup__photo`).cloneNode());
-    }
   }
 
   if (!photos) {
     offerPreset.querySelector(`.popup__photo`).remove();
-  }
+  } else {
+    offerPreset.querySelector(`.popup__photo`).src = photos[0];
 
+    for (let i = 0; i < photos.length; i++) {
+      if (i < photos.length - 1) {
+        offerPreset.querySelector(`.popup__photos`);
+        let newImage = offerPreset.querySelector(`.popup__photo`).cloneNode();
+        newImage.src = photos[i];
+        offerPreset.append(newImage);
+      }
+    }
+  }
+  /*
   for (let i = 0; i < offerPreset.children.length; i++) {
     if (
       (!offerPreset.children[i].textContent && i > 1 && i !== 8 && i !== 10) ||
@@ -290,7 +293,7 @@ const renderOfferCard = (item) => {
       offerPreset.children[i].classList.add(`hidden`);
     }
   }
-
+*/
   return offerPreset;
 };
 
@@ -302,16 +305,20 @@ offers.forEach((pin) => {
 
 map.insertBefore(fragmentOfferCards, filtersContainer);
 
-const toggleFormElementsState = (form, isActive) => {
-  const fieldsets = form.querySelectorAll(`fieldset`);
+const toggleFormElementsState = () => {
+  const fieldsets = document.querySelectorAll(`fieldset, select`);
 
   fieldsets.forEach((fieldset) => {
-    fieldset.disabled = !isActive;
+    fieldset.disabled = !fieldset.disabled;
   });
 };
 
+const getMapState = () => {
+  return map.classList.contains(`.map--faded`);
+};
+
 const completeAddressInput = () => {
-  const y = (isPageActivated)
+  const y = (!getMapState())
     ? Math.round(parseInt(mainMapPin.style.top, 10) + MAIN_MAP_PIN_HEIGHT + MAIN_MAP_PIN_NEEDLE_HEIGHT)
     : Math.round(parseInt(mainMapPin.style.top, 10) + MAIN_MAP_PIN_HEIGHT / 2);
 
@@ -322,36 +329,30 @@ const changeCapacityOptions = () => {
   adFormCapacity.innerHTML = capacityOptions[adFormRoomNumber.value];
 };
 
-let isPageActivated = false;
-
 const activatePage = () => {
-  if (!isPageActivated) {
-    isPageActivated = true;
-    toggleFormElementsState(adForm, true);
-    completeAddressInput();
-    map.classList.remove(`map--faded`);
-    adForm.classList.remove(`ad-form--disabled`);
+  toggleFormElementsState();
+  completeAddressInput();
+  map.classList.remove(`map--faded`);
+  adForm.classList.remove(`ad-form--disabled`);
 
-    offers.forEach((pin) => {
-      fragmentPinList.append(renderOfferPin(pin));
-    });
+  offers.forEach((pin) => {
+    fragmentPinList.append(renderOfferPin(pin));
+  });
 
-    offersZone.append(fragmentPinList);
-  }
+  offersZone.append(fragmentPinList);
 };
 
 const deactivatePage = () => {
-  isPageActivated = false;
   completeAddressInput();
 
-  toggleFormElementsState(adForm, false);
+  toggleFormElementsState();
   changeCapacityOptions();
 
   const minPrice = minPricesMap[adFormType.value];
   adFormPrice.placeholder = minPrice;
   adFormPrice.min = minPrice;
 };
-
+/*
 const openPopup = (id) => {
   const card = offers.find((item) => {
     return item.id === id;
@@ -376,7 +377,7 @@ const onPopupClose = () => {
 };
 
 const onPopupEnterPress = (evt) => {
-  if (evt.key === `Enter`) {
+  if (evt.key === Key.ENTER) {
     evt.preventDefault();
     closePopup();
   }
@@ -392,22 +393,22 @@ const openOffer = (evt) => {
     }
   }
 };
-
+*/
 deactivatePage();
 
 mainMapPin.addEventListener(`mousedown`, (evt) => {
-  if (evt.button === 0) {
+  if (evt.button === MouseKey) {
     activatePage();
-    map.classList.remove(`map--faded`);
   }
 });
 
 mainMapPin.addEventListener(`keydown`, (evt) => {
-  if (evt.key === `Enter`) {
+  if (evt.key === Key.ENTER) {
     activatePage();
   }
 });
 
+/*
 adFormTitle.addEventListener(`invalid`, () => {
   const valueLength = adFormTitle.value.length;
 
@@ -465,3 +466,4 @@ offersZone.addEventListener(`keydown`, (evt) => {
     openOffer(evt);
   }
 });
+*/
