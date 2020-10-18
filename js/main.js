@@ -16,9 +16,6 @@ const LOCATION_X_MIN = 0;
 const LOCATION_Y_MIN = 130;
 const LOCATION_Y_MAX = 630;
 
-const MIN_TITLE_LENGTH = 30;
-const MAX_TITLE_LENGTH = 100;
-const MAX_PRICE = 1000000;
 const PIN_WIDTH = 50;
 const PIN_HEIGHT = 70;
 
@@ -62,7 +59,7 @@ const PHOTO = [
   `http://o0.github.io/assets/images/tokyo/hotel3.jpg`,
 ];
 
-const Key = {  // Enum object
+const Key = { // Enum object
   ENTER: `Enter`,
   ESC: `Escape`
 };
@@ -78,9 +75,6 @@ const typesMap = {
   bungalow: `Бунгало`,
 };
 
-const offersZone = document.querySelector(`.map__pins`);
-const pinTemplate = document.querySelector(`#pin`).content.querySelector(`button`);
-
 const numericalEndingsMap = {
   room: [`комната`, `комнаты`, `комнат`],
   guest: [`гостя`, `гостей`, `гостей`],
@@ -94,31 +88,29 @@ const minPricesMap = {
 };
 
 const numberOfGuests = {
-  1: ['1'],
-  2: ['1', '2'],
-  3: ['1', '2', '3'],
-  100: ['0']
+  1: [`1`],
+  2: [`1`, `2`],
+  3: [`1`, `2`, `3`],
+  100: [`0`]
 };
 
+const offersZone = document.querySelector(`.map__pins`);
+const pinTemplate = document.querySelector(`#pin`).content.querySelector(`button`);
 const map = document.querySelector(`.map`);
 const fragmentPinList = document.createDocumentFragment();
 const fragmentOfferCards = document.createDocumentFragment();
 const cardTemplate = document.querySelector(`#card`).content.querySelector(`.popup`);
 const filtersContainer = map.querySelector(`.map__filters-container`);
 const adForm = document.querySelector(`.ad-form`);
-const adFormTitle = adForm.querySelector(`#title`);
 const adFormAddress = adForm.querySelector(`#address`);
 const adFormPrice = adForm.querySelector(`#price`);
 const adFormType = adForm.querySelector(`#type`);
-const adFormTime = adForm.querySelector(`.ad-form__element--time`);
 const adFormTimein = adForm.querySelector(`#timein`);
 const adFormTimeout = adForm.querySelector(`#timeout`);
 const adFormRoomNumber = adForm.querySelector(`#room_number`);
 const adFormCapacity = adForm.querySelector(`#capacity`);
 const mainMapPin = map.querySelector(`.map__pin--main`);
-let currentOpenedCard;
-
-const capacityOptions = adFormCapacity.querySelectorAll('option');
+const capacityOptions = adFormCapacity.querySelectorAll(`option`);
 
 const validateRooms = () => {
   const roomValue = adFormRoomNumber.value;
@@ -184,9 +176,9 @@ const generateMocks = (n) => {
         guests: getRandomIntNumber(GUESTS_MIN, GUESTS_MAX),
         checkin: getRandomIntNumber(0, CHECK_IN_OUT.length - 1),
         checkout: getRandomIntNumber(0, CHECK_IN_OUT.length - 1),
-        features: getRandomArrayElements(APARTMENT_FEATURES, getRandomIntNumber(1, APARTMENT_FEATURES.length)),
+        features: getRandomArrayElements(APARTMENT_FEATURES, getRandomIntNumber(0, APARTMENT_FEATURES.length - 1)),
         description: getRandomArrayElements(DESCRIPTION_SLOGANS),
-        photos: getRandomArrayElements(PHOTO, getRandomIntNumber(1, PHOTO.length))
+        photos: getRandomArrayElements(PHOTO, getRandomIntNumber(0, PHOTO.length - 1))
       },
       location: {
         x: getRandomIntNumber(LOCATION_X_MIN, offersZone.offsetWidth),
@@ -315,7 +307,7 @@ const renderOfferCard = (item) => {
 
   const closeButton = offerPreset.querySelector(`.popup__close`);
 
-  closeButton.addEventListener(`click`, () => {
+  closeButton.addEventListener(`click`, (evt) => {
     if (evt.button === MouseKey.LEFT) {
       closePopup();
     }
