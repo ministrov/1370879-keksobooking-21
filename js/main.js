@@ -26,10 +26,10 @@ const MAIN_MAP_PIN_NEEDLE_HEIGHT = 22;
 const RENT_WORDS = [
   `Сдам`,
   `Сдается`,
-  `Свободно жилье -`,
+  `Свободно жилье`,
   `Можно арендовать`,
-  `Сдается жилье -`,
-  `Специально для вас -`,
+  `Сдается жилье`,
+  `Специально для вас`,
 ];
 
 const APARTMENT_TYPES = [`palace`, `flat`, `house`, `bungalow`];
@@ -135,6 +135,15 @@ const getRandomIntNumber = (min = 0, max = 100) => {
   return min + Math.floor(Math.random() * (max - min + 1));
 };
 
+const shuffle = (a) => {
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+};
+
+
 const getTrueNumericalEndingWords = (q = 1, word) => {
   if (q % 100 < 11 || q % 100 > 14) {
     if (q % 10 === 1) {
@@ -151,14 +160,6 @@ const getRandomArrayElements = (arr) => {
   return arr[getRandomIntNumber(0, arr.length - 1)];
 };
 
-const getTitle = (type) => {
-  return `${RENT_WORDS[getRandomIntNumber(0, RENT_WORDS.length - 1)]} ${typesMap[type]} ${(Math.random() < 0.5 ? `!` : `.`)}`;
-};
-
-const getDescription = (type, rooms) => {
-  return `${typesMap[type]}, кол-во комнат - ${rooms}, ${getRandomIntNumber(0, DESCRIPTION_SLOGANS)}`;
-};
-
 const generateMocks = (n) => {
   const generatedMocks = [];
 
@@ -168,7 +169,7 @@ const generateMocks = (n) => {
         avatar: `img/avatars/user0${i + 1}.png`
       },
       offer: {
-        title: getRandomArrayElements(RENT_WORDS),
+        title: RENT_WORDS[getRandomIntNumber(0, RENT_WORDS.length - 1)],
         address: ``,
         price: getRandomIntNumber(PRICE_MIN, PRICE_MAX) * PRICE_STEP,
         type: getRandomIntNumber(0, APARTMENT_TYPES.length - 1),
@@ -176,19 +177,15 @@ const generateMocks = (n) => {
         guests: getRandomIntNumber(GUESTS_MIN, GUESTS_MAX),
         checkin: getRandomIntNumber(0, CHECK_IN_OUT.length - 1),
         checkout: getRandomIntNumber(0, CHECK_IN_OUT.length - 1),
-        features: getRandomArrayElements(APARTMENT_FEATURES, getRandomIntNumber(0, APARTMENT_FEATURES.length - 1)),
+        features: shuffle(APARTMENT_FEATURES).slice(0, getRandomIntNumber(0, APARTMENT_FEATURES.length)),
         description: getRandomArrayElements(DESCRIPTION_SLOGANS),
-        photos: getRandomArrayElements(PHOTO, getRandomIntNumber(0, PHOTO.length - 1))
+        photos: [getRandomArrayElements(PHOTO, getRandomIntNumber(0, PHOTO.length - 1))]
       },
       location: {
         x: getRandomIntNumber(LOCATION_X_MIN, offersZone.offsetWidth),
         y: getRandomIntNumber(LOCATION_Y_MIN, LOCATION_Y_MAX)
       }
     };
-
-    mock.offer.title = getTitle(mock.offer.type);
-    mock.offer.address = `${mock.location.x} ${mock.location.y}`;
-    mock.offer.description = getDescription(mock.offer.type, mock.offer.rooms);
 
     generatedMocks.push(mock);
   }
@@ -282,13 +279,18 @@ const renderOfferCard = (item) => {
 
   const popupFeatures = offerPreset.querySelector(`.popup__features`);
 
-  popupFeatures.innerHTML = ``;
+  if (features) {
+    popupFeatures.innerHTML = ``;
 
-  for (let i = 0; i < features.length; i++) {
-    const feature = document.createElement(`li`);
-    feature.classList.add(`popup__feature`, `popup__feature--${features[i]}`);
-    popupFeatures.append(feature);
+    for (let i = 0; i < features.length; i++) {
+      const feature = document.createElement(`li`);
+      feature.classList.add(`popup__feature`, `popup__feature--${features[i]}`);
+      popupFeatures.append(feature);
+    }
+  } else {
+    popupFeatures.remove();
   }
+
 
   if (!photos) {
     offerPreset.querySelector(`.popup__photo`).remove();
