@@ -102,6 +102,7 @@ const fragmentOfferCards = document.createDocumentFragment();
 const cardTemplate = document.querySelector(`#card`).content.querySelector(`.popup`);
 const filtersContainer = map.querySelector(`.map__filters-container`);
 const adForm = document.querySelector(`.ad-form`);
+const userApartmentInput = adForm.querySelector(`#title`);
 const adFormAddress = adForm.querySelector(`#address`);
 const adFormPrice = adForm.querySelector(`#price`);
 const adFormType = adForm.querySelector(`#type`);
@@ -397,4 +398,16 @@ adFormTimein.addEventListener(`change`, () => {
 
 adFormTimeout.addEventListener(`change`, () => {
   adFormTimein.value = adFormTimeout.value;
+});
+
+userApartmentInput.addEventListener(`invalid`, () => {
+  if (userApartmentInput.validity.tooShort) {
+    userApartmentInput.setCustomValidity(`Имя должно состоять минимум из двух символов`);
+  } else if (userApartmentInput.validity.tooLong) {
+    userApartmentInput.setCustomValidity(`Имя не должно превышать 25-ти символов`);
+  } else if (userApartmentInput.validity.valueMissing) {
+    userApartmentInput.setCustomValidity(`Обязательное поле`);
+  } else {
+    userApartmentInput.setCustomValidity(``);
+  }
 });
