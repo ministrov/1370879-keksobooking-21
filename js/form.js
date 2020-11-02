@@ -8,12 +8,12 @@
   const userApartmentInput = adForm.querySelector(`#title`);
   const adFormTimein = adForm.querySelector(`#timein`);
   const adFormTimeout = adForm.querySelector(`#timeout`);
-  const capacityOptions = adFormCapacity.querySelectorAll(`option`);
   const adFormAddress = adForm.querySelector(`#address`);
   const adFormPrice = adForm.querySelector(`#price`);
   const adFormType = adForm.querySelector(`#type`);
   const adFormRoomNumber = adForm.querySelector(`#room_number`);
   const adFormCapacity = adForm.querySelector(`#capacity`);
+  const capacityOptions = adFormCapacity.querySelectorAll(`option`);
 
   const minPricesMap = {
     palace: 10000,
@@ -41,14 +41,6 @@
     adFormAddress.value = `${Math.round(parseInt(window.activatePage.mainMapPin.style.left, 10) + MAIN_MAP_PIN_WIDTH / 2)}, ${y}`;
   };
 
-  const onRoomNumberChange = () => {
-    validateRooms();
-  };
-
-  validateRooms();
-
-  adFormRoomNumber.addEventListener(`change`, onRoomNumberChange);
-
   const validateRooms = () => {
     const roomValue = adFormRoomNumber.value;
     capacityOptions.forEach((option) => {
@@ -59,6 +51,14 @@
       option.hidden = isDisabled;
     });
   };
+
+  const onRoomNumberChange = () => {
+    validateRooms();
+  };
+
+  validateRooms();
+
+  adFormRoomNumber.addEventListener(`change`, onRoomNumberChange);
 
   const toggleFormElementsState = () => {
     const fieldsets = document.querySelectorAll(`fieldset, select`);
