@@ -2,7 +2,9 @@
 
 (function () {
 
+  const MOCK_QUANTITY = 8;
   const mainMapPin = window.main.map.querySelector(`.map__pin--main`);
+  const offers = window.data.generateMocks(MOCK_QUANTITY);
 
   const Key = { // Enum object
     ENTER: `Enter`,

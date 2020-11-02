@@ -3,7 +3,6 @@
 (function () {
   const PIN_WIDTH = 50;
   const PIN_HEIGHT = 70;
-  const MOCK_QUANTITY = 8;
 
   const typesMap = {
     palace: `Дворец`,
@@ -18,7 +17,6 @@
   const fragmentOfferCards = document.createDocumentFragment();
   const cardTemplate = document.querySelector(`#card`).content.querySelector(`.popup`);
   const filtersContainer = map.querySelector(`.map__filters-container`);
-  const offers = window.data.generateMocks(MOCK_QUANTITY);
 
   const renderOfferPin = (offer) => {
     const offerPreset = pinTemplate.cloneNode(true);
@@ -131,10 +129,6 @@
 
     map.insertBefore(offerPreset, filtersContainer);
   };
-
-  offers.forEach((pin) => {
-    fragmentPinList.append(renderOfferPin(pin));
-  });
 
   map.insertBefore(fragmentOfferCards, filtersContainer);
 
