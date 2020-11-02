@@ -101,36 +101,7 @@ const fragmentPinList = document.createDocumentFragment();
 const fragmentOfferCards = document.createDocumentFragment();
 const cardTemplate = document.querySelector(`#card`).content.querySelector(`.popup`);
 const filtersContainer = map.querySelector(`.map__filters-container`);
-const adForm = document.querySelector(`.ad-form`);
-const userApartmentInput = adForm.querySelector(`#title`);
-const adFormAddress = adForm.querySelector(`#address`);
-const adFormPrice = adForm.querySelector(`#price`);
-const adFormType = adForm.querySelector(`#type`);
-const adFormTimein = adForm.querySelector(`#timein`);
-const adFormTimeout = adForm.querySelector(`#timeout`);
-const adFormRoomNumber = adForm.querySelector(`#room_number`);
-const adFormCapacity = adForm.querySelector(`#capacity`);
 const mainMapPin = map.querySelector(`.map__pin--main`);
-const capacityOptions = adFormCapacity.querySelectorAll(`option`);
-
-const validateRooms = () => {
-  const roomValue = adFormRoomNumber.value;
-  capacityOptions.forEach((option) => {
-    let isDisabled = !(numberOfGuests[roomValue].indexOf(option.value) >= 0);
-
-    option.selected = numberOfGuests[roomValue][0] === option.value;
-    option.disabled = isDisabled;
-    option.hidden = isDisabled;
-  });
-};
-
-const onRoomNumberChange = () => {
-  validateRooms();
-};
-
-validateRooms();
-
-adFormRoomNumber.addEventListener(`change`, onRoomNumberChange);
 
 const getRandomIntNumber = (min = 0, max = 100) => {
   return min + Math.floor(Math.random() * (max - min + 1));
@@ -329,24 +300,8 @@ offers.forEach((pin) => {
 
 map.insertBefore(fragmentOfferCards, filtersContainer);
 
-const toggleFormElementsState = () => {
-  const fieldsets = document.querySelectorAll(`fieldset, select`);
-
-  fieldsets.forEach((fieldset) => {
-    fieldset.disabled = !fieldset.disabled;
-  });
-};
-
 const getMapState = () => {
   return map.classList.contains(`.map--faded`);
-};
-
-const completeAddressInput = () => {
-  const y = (!getMapState())
-    ? Math.round(parseInt(mainMapPin.style.top, 10) + MAIN_MAP_PIN_HEIGHT + MAIN_MAP_PIN_NEEDLE_HEIGHT)
-    : Math.round(parseInt(mainMapPin.style.top, 10) + MAIN_MAP_PIN_HEIGHT / 2);
-
-  adFormAddress.value = `${Math.round(parseInt(mainMapPin.style.left, 10) + MAIN_MAP_PIN_WIDTH / 2)}, ${y}`;
 };
 
 const activatePage = () => {
@@ -383,31 +338,5 @@ mainMapPin.addEventListener(`mousedown`, (evt) => {
 mainMapPin.addEventListener(`keydown`, (evt) => {
   if (evt.key === Key.ENTER) {
     activatePage();
-  }
-});
-
-adFormType.addEventListener(`change`, () => {
-  const minPrice = minPricesMap[adFormType.value];
-  adFormPrice.placeholder = minPrice;
-  adFormPrice.min = minPrice;
-});
-
-adFormTimein.addEventListener(`change`, () => {
-  adFormTimeout.value = adFormTimein.value;
-});
-
-adFormTimeout.addEventListener(`change`, () => {
-  adFormTimein.value = adFormTimeout.value;
-});
-
-userApartmentInput.addEventListener(`invalid`, () => {
-  if (userApartmentInput.validity.tooShort) {
-    userApartmentInput.setCustomValidity(`Имя должно состоять минимум из двух символов`);
-  } else if (userApartmentInput.validity.tooLong) {
-    userApartmentInput.setCustomValidity(`Имя не должно превышать 25-ти символов`);
-  } else if (userApartmentInput.validity.valueMissing) {
-    userApartmentInput.setCustomValidity(`Обязательное поле`);
-  } else {
-    userApartmentInput.setCustomValidity(``);
   }
 });
