@@ -2,6 +2,10 @@
 
 (function () {
 
+  const MAIN_MAP_PIN_WIDTH = 62;
+  const MAIN_MAP_PIN_HEIGHT = 62;
+  const MAIN_MAP_PIN_NEEDLE_HEIGHT = 22;
+
   const MOCK_QUANTITY = 8;
   const mainMapPin = window.main.map.querySelector(`.map__pin--main`);
   const offers = window.data.generateMocks(MOCK_QUANTITY);
@@ -15,9 +19,21 @@
     LEFT: 0
   };
 
+  const getMapState = () => {
+    return window.main.map.classList.contains(`.map--faded`);
+  };
+
+  const completeAddressInput = () => {
+    const y = (!getMapState())
+      ? Math.round(parseInt(mainMapPin.style.top, 10) + MAIN_MAP_PIN_HEIGHT + MAIN_MAP_PIN_NEEDLE_HEIGHT)
+      : Math.round(parseInt(mainMapPin.style.top, 10) + MAIN_MAP_PIN_HEIGHT / 2);
+
+    window.form.adFormAddress.value = `${Math.round(parseInt(mainMapPin.style.left, 10) + MAIN_MAP_PIN_WIDTH / 2)}, ${y}`;
+  };
+
   const activatePage = () => {
     window.form.toggleFormElementsState();
-    window.form.completeAddressInput();
+    completeAddressInput();
     window.main.map.classList.remove(`map--faded`);
     window.form.adForm.classList.remove(`ad-form--disabled`);
 
@@ -44,7 +60,7 @@
   };
 
   const deactivatePage = () => {
-    window.form.completeAddressInput();
+    completeAddressInput();
 
     window.form.toggleFormElementsState();
 

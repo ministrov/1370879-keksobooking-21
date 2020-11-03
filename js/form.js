@@ -1,9 +1,6 @@
 'use strict';
 
 (function () {
-  const MAIN_MAP_PIN_WIDTH = 62;
-  const MAIN_MAP_PIN_HEIGHT = 62;
-  const MAIN_MAP_PIN_NEEDLE_HEIGHT = 22;
   const adForm = document.querySelector(`.ad-form`);
   const userApartmentInput = adForm.querySelector(`#title`);
   const adFormTimein = adForm.querySelector(`#timein`);
@@ -27,18 +24,6 @@
     2: [`1`, `2`],
     3: [`1`, `2`, `3`],
     100: [`0`]
-  };
-
-  const getMapState = () => {
-    return window.main.map.classList.contains(`.map--faded`);
-  };
-
-  const completeAddressInput = () => {
-    const y = (!getMapState())
-      ? Math.round(parseInt(window.activatePage.mainMapPin.style.top, 10) + MAIN_MAP_PIN_HEIGHT + MAIN_MAP_PIN_NEEDLE_HEIGHT)
-      : Math.round(parseInt(window.activatePage.mainMapPin.style.top, 10) + MAIN_MAP_PIN_HEIGHT / 2);
-
-    adFormAddress.value = `${Math.round(parseInt(window.activatePage.mainMapPin.style.left, 10) + MAIN_MAP_PIN_WIDTH / 2)}, ${y}`;
   };
 
   const validateRooms = () => {
@@ -95,11 +80,11 @@
   });
 
   window.form = {
-    completeAddressInput,
     toggleFormElementsState,
     adForm,
     adFormType,
     adFormPrice,
-    minPricesMap
+    minPricesMap,
+    adFormAddress
   };
 })();
