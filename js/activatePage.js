@@ -88,6 +88,9 @@
     closePopup,
     offers,
     onCardEscKeyDown,
-    mainMapPin
+    mainMapPin,
+    MAIN_MAP_PIN_NEEDLE_HEIGHT,
+    MAIN_MAP_PIN_WIDTH,
+    MAIN_MAP_PIN_HEIGHT
   };
 })();
