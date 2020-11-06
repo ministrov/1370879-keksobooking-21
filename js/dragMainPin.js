@@ -23,10 +23,10 @@
     evt.preventDefault();
     startCoords.x = evt.clientX;
     startCoords.y = evt.clientY;
-    this.addEventListener(`mousemove`, calcCoords);
-    this.addEventListener(`mouseup`, function (e) {
+    mainPin.addEventListener(`mousemove`, calcCoords);
+    mainPin.addEventListener(`mouseup`, function (e) {
       calcCoords(e);
-      this.removeEventListener(`mousemove`, calcCoords);
+      mainPin.removeEventListener(`mousemove`, calcCoords);
     });
   });
 })();
