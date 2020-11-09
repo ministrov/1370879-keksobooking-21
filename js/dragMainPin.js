@@ -2,31 +2,77 @@
 
 (function () {
 
-  let startCoords = {};
-  const adFormAddress = window.form.adFormAddress;
+  const PIN_HEIGHT = 83;
+  const PIN_WIDTH = 32;
+
   const mainPin = window.activatePage.mainMapPin;
-  const pinNeedleHeight = window.activatePage.MAIN_MAP_PIN_NEEDLE_HEIGHT;
-  const pinHeight = window.activatePage.MAIN_MAP_PIN_HEIGHT;
-  const pinWidth = window.activatePage.MAIN_MAP_PIN_WIDTH;
-  const calcCoords = function (e) {
-    mainPin.style.left = `${mainPin.offsetLeft + e.clientX - startCoords.x}px`;
-    mainPin.style.top = `${mainPin.offsetTop + e.clientY - startCoords.y}px`;
-    const pinCoords = {
-      x: (mainPin.offsetLeft + pinWidth) / 2,
-      y: mainPin.offsetTop + pinHeight + pinNeedleHeight
-    };
-    adFormAddress.value = `${pinCoords.x}, ${pinCoords.y}`;
-    startCoords.x = e.clientX;
-    startCoords.y = e.clientY;
+
+  const locationBorderX = {
+    min: 0,
+    max: 1200
   };
-  mainPin.addEventListener(`mousedown`, function (evt) {
+
+  const locationBorderY = {
+    min: 130,
+    max: 630
+  };
+
+  const setCoordinates = (x, y) => {
+    if (y < locationBorderY.min - PIN_HEIGHT) {
+      y = locationBorderY.min - PIN_HEIGHT;
+    } else if (y > locationBorderY.max - PIN_HEIGHT) {
+      y = locationBorderY.max - PIN_HEIGHT;
+    } else if (x < locationBorderX.min - PIN_WIDTH) {
+      x = locationBorderX.min - PIN_WIDTH;
+    } else if (x > locationBorderX.max - PIN_WIDTH) {
+      x = locationBorderX.max - PIN_WIDTH;
+    }
+
+    mainPin.style.left = `${x}px`;
+    mainPin.style.top = `${y}px`;
+  };
+
+  const onPinMouseDown = (evt) => {
     evt.preventDefault();
-    startCoords.x = evt.clientX;
-    startCoords.y = evt.clientY;
-    mainPin.addEventListener(`mousemove`, calcCoords);
-    mainPin.addEventListener(`mouseup`, function (e) {
-      calcCoords(e);
-      mainPin.removeEventListener(`mousemove`, calcCoords);
-    });
-  });
+
+    let startCoords = {
+      x: evt.clientX,
+      y: evt.clientY
+    };
+
+    const setNewCoordinates = function (element) {
+      let shift = {
+        x: startCoords.x - element.clientX,
+        y: startCoords.y - element.clientY
+      };
+
+      startCoords = {
+        x: element.clientX,
+        y: element.clientY
+      };
+
+      // mainPin.style.top = `${mainPin.offsetTop - shift.y}px`;
+      // mainPin.style.left = `${mainPin.offsetLeft - shift.x}px`;
+
+      setCoordinates(mainPin.offsetLeft - shift.x, mainPin.offsetTop - shift.y);
+    };
+
+    const mouseMoveHandler = function (moveEvt) {
+      moveEvt.preventDefault();
+
+      setNewCoordinates(moveEvt);
+    };
+
+    const mouseUpHandler = function (upEvt) {
+      upEvt.preventDefault();
+      // условие при котором не будет отключаться форма
+      document.removeEventListener(`mousemove`, mouseMoveHandler);
+      document.removeEventListener(`mouseup`, mouseUpHandler);
+    };
+
+    document.addEventListener(`mousemove`, mouseMoveHandler);
+    document.addEventListener(`mouseup`, mouseUpHandler);
+  };
+
+  mainPin.addEventListener(`mousedown`, onPinMouseDown);
 })();

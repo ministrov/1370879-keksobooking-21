@@ -71,11 +71,14 @@
 
   deactivatePage();
 
-  mainMapPin.addEventListener(`mousedown`, (evt) => {
+  const onMainPinMouseDown = (evt) => {
     if (evt.button === MouseKey.LEFT) {
       activatePage();
+      mainMapPin.removeEventListener(`mousedown`, onMainPinMouseDown);
     }
-  });
+  };
+
+  mainMapPin.addEventListener(`mousedown`, onMainPinMouseDown);
 
   mainMapPin.addEventListener(`keydown`, (evt) => {
     if (evt.key === Key.ENTER) {
