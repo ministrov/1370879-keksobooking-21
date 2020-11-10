@@ -71,11 +71,14 @@
 
   deactivatePage();
 
-  mainMapPin.addEventListener(`mousedown`, (evt) => {
+  const onMainPinMouseDown = (evt) => {
     if (evt.button === MouseKey.LEFT) {
       activatePage();
+      mainMapPin.removeEventListener(`mousedown`, onMainPinMouseDown);
     }
-  });
+  };
+
+  mainMapPin.addEventListener(`mousedown`, onMainPinMouseDown);
 
   mainMapPin.addEventListener(`keydown`, (evt) => {
     if (evt.key === Key.ENTER) {
@@ -88,6 +91,9 @@
     closePopup,
     offers,
     onCardEscKeyDown,
-    mainMapPin
+    mainMapPin,
+    MAIN_MAP_PIN_NEEDLE_HEIGHT,
+    MAIN_MAP_PIN_WIDTH,
+    MAIN_MAP_PIN_HEIGHT
   };
 })();
