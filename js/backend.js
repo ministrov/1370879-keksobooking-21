@@ -1,8 +1,8 @@
 'use strict';
 
 (function () {
-  const GET_URL = `https://21.javascript.pages.academy/code-and-magick/data`;
-  const POST_URL = `https://21.javascript.pages.academy/code-and-magick`;
+  const GET_URL = `https://21.javascript.pages.academy/keksobooking/data`;
+  const POST_URL = `https://21.javascript.pages.academy/keksobooking`;
   const TIME_OUT_MS = 10000;
 
   const StatusCode = {

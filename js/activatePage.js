@@ -6,9 +6,10 @@
   const MAIN_MAP_PIN_HEIGHT = 62;
   const MAIN_MAP_PIN_NEEDLE_HEIGHT = 22;
 
-  const MOCK_QUANTITY = 8;
+  const MAX_COUNT = 5;
   const mainMapPin = window.main.map.querySelector(`.map__pin--main`);
-  const offers = window.data.generateMocks(MOCK_QUANTITY);
+  const offersZone = document.querySelector(`.map__pins`);
+  const offers = [];
 
   const Key = { // Enum object
     ENTER: `Enter`,
@@ -31,17 +32,33 @@
     window.form.adFormAddress.value = `${Math.round(parseInt(mainMapPin.style.left, 10) + MAIN_MAP_PIN_WIDTH / 2)}, ${y}`;
   };
 
-  const activatePage = () => {
+  const onSuccess = (data) => {
     window.form.toggleFormElementsState();
     completeAddressInput();
+
     window.main.map.classList.remove(`map--faded`);
     window.form.adForm.classList.remove(`ad-form--disabled`);
 
-    offers.forEach((pin) => {
+    data.slice().forEach((item) => {
+      if (item.offer) {
+        offers.push(item);
+      }
+    });
+
+    offers.slice(0, MAX_COUNT).forEach((pin) => {
       window.main.fragmentPinList.append(window.main.renderOfferPin(pin));
     });
 
-    window.data.offersZone.append(window.main.fragmentPinList);
+    offersZone.append(window.main.fragmentPinList);
+  };
+
+  const onError = (error) => {
+    // вывод ошибки
+    alert(error);
+  };
+
+  const activatePage = () => {
+    window.backend.load(onSuccess, onError);
   };
 
   const onCardEscKeyDown = (evt) => {
