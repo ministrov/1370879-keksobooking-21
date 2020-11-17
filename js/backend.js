@@ -1,7 +1,7 @@
 'use strict';
 
 (function () {
-  const GET_URL = `https://21.javascript.pages.academy/keksobooking/data`;
+  const GET_URL = `https://21.javascript.pages.academy/keksobooking/data1`;
   const POST_URL = `https://21.javascript.pages.academy/keksobooking`;
   const TIME_OUT_MS = 10000;
 
